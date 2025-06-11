@@ -23,10 +23,15 @@ library(ggeffects) # generating model predictions
 library(gtsummary) # generating summary tables for models 
 library(ggplot2) # visualizations
 library(hms) # working with times
+library(MuMIn) 
+library(DHARMa)
 ```
 
 ```{r Reading In Data}
-sst <- read_csv(here("data", "SST_update2023.csv")) # read in my data
+sst <- read_csv(here("data", "SST_update2023.csv")) # read in sea surface temperature data
+parrot <- read_csv( 
+  # read in data and specify file path
+  here("data", "occdist.csv"))
 ```
 
 # Problem 1. Research Writing
@@ -88,15 +93,15 @@ str(sst_clean)
 
 ```{r Creating Time-Series Visualization}
 
-ggplot(data = sst_clean, 
-       aes(x=month, 
-           y=mean_monthly_sst,
-           group = year,
-           color= factor(year))) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 2) +
-  scale_color_manual(
-    values= c(
+ggplot(data = sst_clean, # select cleaned data frame
+       aes(x=month, # x axis as month
+           y=mean_monthly_sst, # y axis as mean monthly sea surface temperature
+           group = year,# group by year so a separate line shows up for each year
+           color= factor(year))) + # each year as a factor
+  geom_line(linewidth = 1) + # select thickness of line
+  geom_point(size = 2) + # select size of point
+  scale_color_manual( # manually choose colors
+    values= c( # c, for list of colors
       "2018" = "#aec7e8",
       "2019" = "#7fc6e8",
       "2020" = "#487db1",
@@ -104,29 +109,111 @@ ggplot(data = sst_clean,
       "2022" = "#1e2f40", 
       "2023" = "#000000"
       )) +
-  labs(x = substitute(paste(bold('Month'))),
+  labs(x = substitute(paste(bold('Month'))), # label x, y, and legend as well as bold
        y = substitute(paste(bold("Mean Monthly Surface Temperature (°C)"))),
        color = substitute(paste(bold("Year"))),
        ) +
-  theme(
+  theme( # custom theme to remove all elements except add gray border 
     panel.background = element_rect(
       fill = "white",
       colour = NA),       # white panel fill, no border here
     panel.border = element_rect(
       fill = NA, 
       colour = "#808080", 
-      size = 1),  # thick black border
-    plot.background  = element_rect(fill = "white", colour = NA),       # white outside panel
-    panel.grid.major = element_blank(),
+      size = 1),  # size of border
+    plot.background  = element_rect(fill = "white", colour = NA), # remove any color
+    panel.grid.major = element_blank(), # make everything blank
     panel.grid.minor = element_blank(),
     axis.ticks        = element_blank()) +
   theme(
-    legend.position = c(.16,.95), # adjust legend position to top left inside the graph
-    legend.justification = c(.8,1) # make corner of legend to corner of graph
+    legend.position = c(.16,.95), # position graph in top left corner
+    legend.justification = c(.8,1) # specify other corner
   )
 ```
 
+# Problem 3: Data Analysis 
 
+## a. 
+[The ones in this dataset represent an prescence of bird within each column, meaning prescence of swift parrot, common starling, unoccupied, or tree martin within each categorical column for each species. The 0s indicate that the box for each category is other species, empty, or occupied.]
+
+## b. 
+[Swift parrots are nomadic, critically endangered due to deforestation and predation, and rarely breed in the same location. The selective nature of swift parrots is different from common starlings and Tree Martins, which are generalists and can easily compete with swift parrots for nest boxes.]
+
+## c. 
+[The two years the authors looked at were 2016 and 2019 during breeding times for swift parrots stimulated by mast tree flowering event. Swift parrots are not known to occupy repeat breeding sites, so the second season tests how permanent next boxes are utilized by swift parrots and non-target species.]
+
+
+## d. 
+
+| Model number | Season | Distance to Forest Edge | Model Description            |  
+|:------------:|:------:|:-----------------------:|------------------------------|  
+| 0            |        |                         | No predictors (null model)   |
+| 1            |    X   |            X            | all predictors (full model)  | 
+| 2            |    X   |                         | Season Only                  |
+| 3            |        |            X            | Distance to Forest Edge Only |    
+ 
+## e. 
+
+```{r Cleaning Parrot Data}
+parrot_clean <- parrot |> 
+  clean_names() |> 
+   mutate(
+    swift_parrot = box_occupant == "swift parrot"
+  ) |> 
+  mutate(
+    season = as.factor(season)
+  ) |> 
+  select(
+    box_occupant,
+    edge_distance,
+    season,
+    swift_parrot
+         ) 
+```
+
+```{r}
+# model 0: null model
+model0 <- glm(
+  swift_parrot ~ 1, # Null model ,no other variables
+  data = parrot_clean, # DF
+  family = "binomial" # binomial distribution, swift parrot or not
+)
+
+# model 1: Saturated Model
+model1 <- glm(
+  swift_parrot ~ season + edge_distance, # account for season and distance from forest edge
+  data = parrot_clean, # DF
+  family = "binomial" # binomial distribution
+)
+
+# model 2: Univariate Model: distance from edge
+model2 <- glm(
+  swift_parrot ~ season, # Only account for season
+  data = parrot_clean,
+  family = "binomial"
+)
+
+# model 3: Univariate Model: Season
+model3 <- glm(
+  swift_parrot ~ edge_distance, # only account for distance from edge
+  data = parrot_clean,
+  family = "binomial" 
+)
+```
+
+```{r Simulate Residuals}
+# Use DHARMa Package to simulate residuals for each model
+residuals0 = simulateResiduals(model0)
+residuals1 = simulateResiduals(model1)
+residuals2 = simulateResiduals(model2)
+residuals3 = simulateResiduals(model3)
+
+# Use DHARMa Package to plot residuals 
+plot(residuals0)
+plot(residuals1)
+plot(residuals2)
+plot(residuals3)
+```
 
 
 
