@@ -1,4 +1,51 @@
 ---
 title: "final_template"
+author: "Hibah Ganie"
+date: "2025-06-10"
 output: html_document
 ---
+## [Hibah's Github Repository](https://github.com/hibdawg/ENVS-193DS_spring-2025_final)
+
+```{r Reading In Packages}
+library(tidyverse) # General use
+library(janitor) # Cleaning data Frames
+library(dplyr) # Mutate columns
+library(lubridate) # make dealing with dates easier
+library(here) # File Organization
+library(readxl) # reading .xlsx files
+library(ggeffects) # generating model predictions
+library(gtsummary) # generating summary tables for models 
+library(ggplot2) # visualizations
+library(hms) # working with times
+library(gt) # tables
+library(png) # images
+library(grid) # images
+library(ggimage) # images
+```
+
+```{r Reading In Data}
+sst <- read_csv(here("data", "SST_update2023.csv")) # read in my data
+```
+
+# Problem 1. Research Writing
+
+## a. 
+[In part one they used a correlation test to determine how two variables, distance from headwater (km) and annual total nitrogen load (kg year^-1) relate or are associated with eachother. My coworker also use an ANOVA in part 2 to compare the means of more than two groups.]
+
+## b.
+[Accepting uncertainty is key in interpreting analysis of variance, and can be conducted through communicating the confidence intervals, such as the CI of the difference between urban land, atmospheric desposition, fertilizer, wastewater treatment, and grasslands.Tukey's Honestly Signifiant difference can be used to further investigate which groups are diffent when compares, giving information on pairwise comparison, difference in means between groups, and adjusted p-value to increase transparency.Effect size can also be used to determine how strongly distance from headwater (KM) effects the annual total nitrogen load (kg year^-1) found between groups.]
+
+ 
+## c. 
+[We found a neglible difference (n^2= effect size) between groups in mean nitrogen load (One-Way Anova, F-distribution(among groups Degrees of Freedom,within group Degrees of Freedom) = f-value, p < 0.02, $\alpha$ = signifcance level)
+
+On average, there was little difference of nitrogen load between urban land, atmospheric deposition, fertilizer, wastewater treatment and grasslands (Tukey HSD difference, % Confidence Interval:[CI, CI](kg year^-1) based on distance from headwater (KM)) ]
+
+# Problem 2. Data Visualization
+
+## a. Cleaning and Summarizing 
+
+```{r Cleaning SST Data}
+
+```
+
