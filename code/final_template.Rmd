@@ -3,6 +3,12 @@ title: "final_template"
 author: "Hibah Ganie"
 date: "2025-06-10"
 output: html_document
+format:
+  html:
+    toc: true # use this to display a table of contents
+execute:
+  message: false # use this to make sure messages don't show up
+  warning: false # use this to make sure warnings don't show up
 ---
 ## [Hibah's Github Repository](https://github.com/hibdawg/ENVS-193DS_spring-2025_final)
 
@@ -17,10 +23,6 @@ library(ggeffects) # generating model predictions
 library(gtsummary) # generating summary tables for models 
 library(ggplot2) # visualizations
 library(hms) # working with times
-library(gt) # tables
-library(png) # images
-library(grid) # images
-library(ggimage) # images
 ```
 
 ```{r Reading In Data}
@@ -46,6 +48,94 @@ On average, there was little difference of nitrogen load between urban land, atm
 ## a. Cleaning and Summarizing 
 
 ```{r Cleaning SST Data}
+sst_clean <- sst |> 
+  # select sst data frame
+  clean_names() |> 
+  # remove spaces and uppercase letters (cleans)
+  mutate( # mutate function to change formatting of date, year, and month using lubridate package
+    date = ymd(date), #year, month, date formate for date column                    
+    year = year(date), # change from chr to num for year  
+    month = month(date, label = TRUE, abbr = TRUE) # change month to an ordered factor and abbreviate
+  ) |> 
+  filter(year >= 2018) |> 
+  # filters years to after 2018
+  mutate(
+    year = factor(year), # convert year to factor
+    month = factor(month, levels = month.abb, ordered = TRUE) # month as a factor
+  ) |> 
+  group_by(year, month) |> 
+  # group together year and month for mean monthly SST calculation
+  summarise(mean_monthly_sst = 
+              mean(temp, na.rm = TRUE),
+            .groups = "drop") |> 
+  # Calculate mean monthly sst and ignore missing values, then drop the grouping
+  mutate(
+    mean_monthly_sst = (format(round(mean_monthly_sst, 1), nsmall = 1) # round values to one decimal point
+  )) |> 
+  # One last mutate to convert from chr to number, or dbl format
+  mutate( 
+    mean_monthly_sst = 
+      as.numeric(mean_monthly_sst)
+  )
 
+# Randomly display 5 rows from sst_clean data frame
+sst_clean |> 
+  slice_sample(n = 5)
+
+#display structure of dataframe
+str(sst_clean)
 ```
+
+```{r Creating Time-Series Visualization}
+
+ggplot(data = sst_clean, 
+       aes(x=month, 
+           y=mean_monthly_sst,
+           group = year,
+           color= factor(year))) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  scale_color_manual(
+    values= c(
+      "2018" = "#aec7e8",
+      "2019" = "#7fc6e8",
+      "2020" = "#487db1",
+      "2021" = "#2c4d79",
+      "2022" = "#1e2f40", 
+      "2023" = "#000000"
+      )) +
+  labs(x = substitute(paste(bold('Month'))),
+       y = substitute(paste(bold("Mean Monthly Surface Temperature (°C)"))),
+       color = substitute(paste(bold("Year"))),
+       ) +
+  theme(
+    panel.background = element_rect(
+      fill = "white",
+      colour = NA),       # white panel fill, no border here
+    panel.border = element_rect(
+      fill = NA, 
+      colour = "#808080", 
+      size = 1),  # thick black border
+    plot.background  = element_rect(fill = "white", colour = NA),       # white outside panel
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.ticks        = element_blank()) +
+  theme(
+    legend.position = c(.16,.95), # adjust legend position to top left inside the graph
+    legend.justification = c(.8,1) # make corner of legend to corner of graph
+  )
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
