@@ -256,25 +256,81 @@ mod_preds <- ggpredict(
   terms = c("edge_distance", "season") # predictors
   ) 
 
-ggplot(parrot_clean,
+mycolors <- c("2016" = "orchid",
+              "2019" = "purple3")
+
+ggplot(parrot_clean, # background f
        aes(x = edge_distance,
-           y = as.numeric(as.character(swift_parrot)))) +
-  geom_point(size = 3,
-             alpha = 0.4) + 
+           y = as.numeric(swift_parrot) -1
+           )
+       ) +
+  geom_point(aes(color = season),
+             size = 3,
+             alpha = 0.4) +
+  labs(x = substitute(paste(bold('Distance from Forest Edge (m)'))), # label x, y, and legend as well as bold
+       y = substitute(paste(bold("Presence of Swift Parrot Predictions"))),
+       color = substitute(paste(bold("Year"))),
+       ) +
   geom_ribbon(data = mod_preds,
               aes(x = x,
                   y = predicted,
                   ymin = conf.low,
                   ymax = conf.high,
                   fill = group),
-              alpha = 0.4) + 
+              alpha = 0.4,
+              inherit.aes = FALSE) +
+
   geom_line(data = mod_preds,
             aes(x = x,
                 y = predicted,
                 color = group),
             size = 1.2,
             inherit.aes = FALSE) +
+  
+  scale_color_manual(values = mycolors) +
+  scale_fill_manual(values = mycolors) +
+  
   scale_y_continuous(limits = c(0,1)) +
-  labs(color = "season", fill = "season")
+  labs(color = "season",
+       fill = "season") + 
+  theme( 
+  panel.grid.major = element_blank(), # make everything blan
+  panel.grid.minor = element_blank())
 ```
+# i. Write a Caption
+[Figure 2. Prescense of Swift Parrot Predictions vs Distance from Forest Edge across seasons, 2016 and 2019. The figure displays predictions of swift parrot presence as distance from the forest edge increases. Stojanovic, Dejan et al. (2021). https://doi.org/10.5061/dryad.83bk3j9sb]
+
+# j. Calculate Model Predictions
+[If the forest edge is 0m away the probability of Swift Parrot Occupancy in 2016 is .48(95%CI[0.33, 0.64])
+
+If the forest edge is 900m away the probability of Swift Parrot Occupancy in 2016 is .12(95%CI[0.06, 0.24])
+
+If the forest edge is 0m away the probability of Swift Parrot Occupancy in 2019 is .30(95%CI[0.18, 0.44])
+
+If the forest edge is 900m away the probability of Swift Parrot Occupancy in 2019 is .06(95%CI[0.03, 0.13])]
+
+```{r Calculate Model1 Pred: Distance/Season}
+ggpredict(model1,
+          terms = c("edge_distance [0]", "season[2016]"))
+
+ggpredict(model1,
+          terms = c("edge_distance [900]", "season[2016]"))
+
+ggpredict(model1,
+          terms = c("edge_distance [0]", "season[2019]"))
+
+ggpredict(model1,
+          terms = c("edge_distance [900]", "season[2019]"))
+``` 
+
+
+# K. Describe Your Results
+[Swift parrots tend to occupy nest boxes at a higher frequency when closer to the edge of the forest. Furthermore, occupancy typically decreases with time, with the inital breeding season data recieving higher prescence of swift parrots.
+
+Predicted occupancy at the beginning of the forest edge was .48% and .12% at 900 meters in 2016. On the other hand, in 2019 occupancy was predicted at .30 at the edge of the forest and .06 at 900 meters away from the forest. 
+
+For example, In 2019, With every 1m increase in distance, the odds of Swift Parrot occupancy decreased by a factor of 1.00(95%CI:[0.23, 0.89], p = 0.022, $\alpha$ = 0.05)
+
+Likely swift parrot's specialist preference for tree cavities and dislike for resuing previous breeding locations is behind the declining occupancy prediction with distance from forest and subsequent season since 2016.]
+
 
