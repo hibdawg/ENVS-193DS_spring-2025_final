@@ -150,12 +150,12 @@ ggplot(data = sst_clean, # select cleaned data frame
 
 ## d.
 
-| Model number | Season | Distance to Forest Edge | Model Description            |
-|:-------------:|:-------------:|:------------------:|------------------------|
-|      0       |        |                         | No predictors (null model)   |
-|      1       |   X    |            X            | all predictors (full model)  |
-|      2       |   X    |                         | Season Only                  |
-|      3       |        |            X            | Distance to Forest Edge Only |
+| Model number  | Season | Distance to Forest Edge    | Model Description            |
+|:-------------:|:------:|:--------------------------:|------------------------------|
+|      0        |        |                            | No predictors (null model)   |
+|      1        |   X    |            X               | all predictors (full model)  |
+|      2        |   X    |                            | Season Only                  |
+|      3        |        |            X               | Distance to Forest Edge Only |
 
 ## e.
 

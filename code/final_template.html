@@ -393,8 +393,8 @@ library(hms) # working with times</code></pre>
 ## The following object is masked from &#39;package:lubridate&#39;:
 ## 
 ##     hms</code></pre>
-<pre class="r"><code>library(MuMIn) 
-library(DHARMa)</code></pre>
+<pre class="r"><code>library(MuMIn) # For building Model
+library(DHARMa) # For viewing residuals</code></pre>
 <pre><code>## This is DHARMa 0.4.7. For overview type &#39;?DHARMa&#39;. For recent changes, type news(package = &#39;DHARMa&#39;)</code></pre>
 <pre class="r"><code>sst &lt;- read_csv(here(&quot;data&quot;, &quot;SST_update2023.csv&quot;)) # read in sea surface temperature data</code></pre>
 <pre><code>## Rows: 291384 Columns: 5
@@ -420,16 +420,16 @@ library(DHARMa)</code></pre>
 </div>
 <div id="problem-1.-research-writing" class="section level1">
 <h1>Problem 1. Research Writing</h1>
-<div id="a." class="section level2">
-<h2>a.</h2>
+<div id="a.-transparent-statistical-methods" class="section level2">
+<h2>a. Transparent statistical methods</h2>
 <p>[In part one they used a correlation test to determine how two
 variables, distance from headwater (km) and annual total nitrogen load
 (kg year^-1) relate or are associated with eachother. My coworker also
 use an ANOVA in part 2 to compare the means of more than two
 groups.]</p>
 </div>
-<div id="b." class="section level2">
-<h2>b.</h2>
+<div id="b.-more-information-needed" class="section level2">
+<h2>b. More information needed</h2>
 <p>[Accepting uncertainty is key in interpreting analysis of variance,
 and can be conducted through communicating the confidence intervals,
 such as the CI of the difference between urban land, atmospheric
@@ -441,8 +441,8 @@ increase transparency.Effect size can also be used to determine how
 strongly distance from headwaters (KM) effects the annual total nitrogen
 load (kg year^-1) found between groups.]</p>
 </div>
-<div id="c." class="section level2">
-<h2>c.</h2>
+<div id="c.-suggestions-for-rewriting" class="section level2">
+<h2>c. Suggestions for rewriting</h2>
 <p>[We found a negligible difference (n^2= effect size) between groups
 in mean nitrogen load (One-Way Anova, F-distribution(among groups
 Degrees of Freedom,within group Degrees of Freedom) = f-value, p &lt;
@@ -494,11 +494,11 @@ sst_clean |&gt;
 <pre><code>## # A tibble: 5 × 3
 ##   year  month mean_monthly_sst
 ##   &lt;fct&gt; &lt;ord&gt;            &lt;dbl&gt;
-## 1 2020  Aug               17.8
-## 2 2021  Oct               16.6
-## 3 2023  Mar               12.8
-## 4 2018  Apr               12.8
-## 5 2019  May               14.3</code></pre>
+## 1 2020  Dec               14.5
+## 2 2019  Dec               15  
+## 3 2020  May               14.6
+## 4 2022  Sep               19.3
+## 5 2022  Jan               13.9</code></pre>
 <pre class="r"><code>#display structure of dataframe
 str(sst_clean)</code></pre>
 <pre><code>## tibble [72 × 3] (S3: tbl_df/tbl/data.frame)
@@ -557,7 +557,7 @@ str(sst_clean)</code></pre>
 </div>
 <div id="problem-3-data-analysis" class="section level1">
 <h1>Problem 3: Data Analysis</h1>
-<div id="a.-1" class="section level2">
+<div id="a." class="section level2">
 <h2>a.</h2>
 <p>[The ones in this data set represent an presence of bird within each
 column, meaning presence of swift parrot, common starling, unoccupied,
@@ -565,7 +565,7 @@ or tree martin within each categorical column for each species. The 0s
 indicate that the box for each category is other species, empty, or
 occupied.]</p>
 </div>
-<div id="b.-1" class="section level2">
+<div id="b." class="section level2">
 <h2>b.</h2>
 <p>[Swift parrots are nomadic, critically endangered due to
 deforestation and predation, and rarely breed in the same location. The
@@ -573,7 +573,7 @@ selective nature of swift parrots is different from common starlings and
 Tree Martins, which are generalists and can easily compete with swift
 parrots for nest boxes.]</p>
 </div>
-<div id="c.-1" class="section level2">
+<div id="c." class="section level2">
 <h2>c.</h2>
 <p>[The two years the authors looked at were 2016 and 2019 during
 breeding times for swift parrots stimulated by mast tree flowering
@@ -583,12 +583,12 @@ parrots and non-target species.]</p>
 </div>
 <div id="d." class="section level2">
 <h2>d.</h2>
-<table>
+<table style="width:100%;">
 <colgroup>
-<col width="20%" />
-<col width="20%" />
-<col width="27%" />
-<col width="32%" />
+<col width="18%" />
+<col width="9%" />
+<col width="34%" />
+<col width="37%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -629,19 +629,24 @@ parrots and non-target species.]</p>
 <div id="e." class="section level2">
 <h2>e.</h2>
 <pre class="r"><code>parrot_clean &lt;- parrot |&gt; 
+  # select orginal data frame
   clean_names() |&gt; 
-   mutate(
+  # remove spaces and upercases
+   mutate( # create new column for swift parrot
     swift_parrot = box_occupant == &quot;swift parrot&quot;
   ) |&gt; 
-  mutate(
+  # create new column for season/year and make it a factor
+  mutate( 
     season = as.factor(season)
   ) |&gt; 
+  # select which columns i want
   select(
     box_occupant,
     edge_distance,
     season,
     swift_parrot
          ) |&gt; 
+  # swift parrot as a factor for modeling
   mutate(
     swift_parrot = as.factor(swift_parrot)
   )</code></pre>
@@ -719,43 +724,46 @@ from forest edge (m)]</p>
   ) </code></pre>
 <pre><code>## Data were &#39;prettified&#39;. Consider using `terms=&quot;edge_distance [all]&quot;` to
 ##   get smooth plots.</code></pre>
-<pre class="r"><code>mycolors &lt;- c(&quot;2016&quot; = &quot;orchid&quot;,
+<pre class="r"><code># Picking colors for each layer of visualization
+mycolors &lt;- c(&quot;2016&quot; = &quot;orchid&quot;,
               &quot;2019&quot; = &quot;purple3&quot;)
 
-ggplot(parrot_clean, # background f
+ggplot(parrot_clean, # background data, include scatterplots
        aes(x = edge_distance,
-           y = as.numeric(swift_parrot) -1
+           y = as.numeric(swift_parrot) -1 # include data despite factor stucture
            )
        ) +
-  geom_point(aes(color = season),
+  geom_point(aes(color = season), # color based on year/season
              size = 3,
              alpha = 0.4) +
   labs(x = substitute(paste(bold(&#39;Distance from Forest Edge (m)&#39;))), # label x, y, and legend as well as bold
        y = substitute(paste(bold(&quot;Presence of Swift Parrot Predictions&quot;))),
        color = substitute(paste(bold(&quot;Year&quot;))),
        ) +
+  # add 95% confidence interval 
   geom_ribbon(data = mod_preds,
               aes(x = x,
                   y = predicted,
-                  ymin = conf.low,
+                  ymin = conf.low, 
                   ymax = conf.high,
                   fill = group),
               alpha = 0.4,
               inherit.aes = FALSE) +
-
+# add line layer to data with model predictions and group by year/season
   geom_line(data = mod_preds,
             aes(x = x,
                 y = predicted,
                 color = group),
             size = 1.2,
             inherit.aes = FALSE) +
-  
+  #manually set colors to previously defined colors
   scale_color_manual(values = mycolors) +
   scale_fill_manual(values = mycolors) +
-  
+  # set scale
   scale_y_continuous(limits = c(0,1)) +
   labs(color = &quot;season&quot;,
        fill = &quot;season&quot;) + 
+  # remoce grids 
   theme( 
   panel.grid.major = element_blank(), # make everything blan
   panel.grid.minor = element_blank())</code></pre>
@@ -780,7 +788,8 @@ Occupancy in 2016 is .12(95%CI[0.06, 0.24])</p>
 Occupancy in 2019 is .30(95%CI[0.18, 0.44])</p>
 <p>If the forest edge is 900m away the probability of Swift Parrot
 Occupancy in 2019 is .06(95%CI[0.03, 0.13])]</p>
-<pre class="r"><code>ggpredict(model1,
+<pre class="r"><code># model formula, select for distance from forest and season/year
+ggpredict(model1,
           terms = c(&quot;edge_distance [0]&quot;, &quot;season[2016]&quot;))</code></pre>
 <pre><code>## # Predicted probabilities of swift_parrot
 ## 
