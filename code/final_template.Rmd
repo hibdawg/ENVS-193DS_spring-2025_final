@@ -10,6 +10,7 @@ execute:
   message: false # use this to make sure messages don't show up
   warning: false # use this to make sure warnings don't show up
 ---
+
 ## [Hibah's Github Repository](https://github.com/hibdawg/ENVS-193DS_spring-2025_final)
 
 ```{r Reading In Packages}
@@ -36,21 +37,23 @@ parrot <- read_csv(
 
 # Problem 1. Research Writing
 
-## a. 
-[In part one they used a correlation test to determine how two variables, distance from headwater (km) and annual total nitrogen load (kg year^-1) relate or are associated with eachother. My coworker also use an ANOVA in part 2 to compare the means of more than two groups.]
+## a.
+
+[In part one they used a correlation test to determine how two variables, distance from headwater (km) and annual total nitrogen load (kg year\^-1) relate or are associated with eachother. My coworker also use an ANOVA in part 2 to compare the means of more than two groups.]
 
 ## b.
-[Accepting uncertainty is key in interpreting analysis of variance, and can be conducted through communicating the confidence intervals, such as the CI of the difference between urban land, atmospheric desposition, fertilizer, wastewater treatment, and grasslands.Tukey's Honestly Signifiant difference can be used to further investigate which groups are diffent when compares, giving information on pairwise comparison, difference in means between groups, and adjusted p-value to increase transparency.Effect size can also be used to determine how strongly distance from headwater (KM) effects the annual total nitrogen load (kg year^-1) found between groups.]
 
- 
-## c. 
-[We found a neglible difference (n^2= effect size) between groups in mean nitrogen load (One-Way Anova, F-distribution(among groups Degrees of Freedom,within group Degrees of Freedom) = f-value, p < 0.02, $\alpha$ = signifcance level)
+[Accepting uncertainty is key in interpreting analysis of variance, and can be conducted through communicating the confidence intervals, such as the CI of the difference between urban land, atmospheric deposition, fertilizer, waste water treatment, and grasslands.Tukey's Honestly Signifiant difference can be used to further investigate which groups are different when compares, giving information on pairwise comparison, difference in means between groups, and adjusted p-value to increase transparency.Effect size can also be used to determine how strongly distance from headwaters (KM) effects the annual total nitrogen load (kg year\^-1) found between groups.]
 
-On average, there was little difference of nitrogen load between urban land, atmospheric deposition, fertilizer, wastewater treatment and grasslands (Tukey HSD difference, % Confidence Interval:[CI, CI](kg year^-1) based on distance from headwater (KM)) ]
+## c.
+
+[We found a negligible difference (n\^2= effect size) between groups in mean nitrogen load (One-Way Anova, F-distribution(among groups Degrees of Freedom,within group Degrees of Freedom) = f-value, p \< 0.02, $\alpha$ = significance level)
+
+On average, there was little difference of nitrogen load between urban land, atmospheric deposition, fertilizer, waste water treatment and grasslands (Tukey HSD difference, % Confidence Interval:[CI, CI](kg%20year%5E-1) based on distance from headwaters (KM)) ]
 
 # Problem 2. Data Visualization
 
-## a. Cleaning and Summarizing 
+## a. Cleaning and Summarizing
 
 ```{r Cleaning SST Data}
 sst_clean <- sst |> 
@@ -131,28 +134,30 @@ ggplot(data = sst_clean, # select cleaned data frame
   )
 ```
 
-# Problem 3: Data Analysis 
+# Problem 3: Data Analysis
 
-## a. 
-[The ones in this dataset represent an prescence of bird within each column, meaning prescence of swift parrot, common starling, unoccupied, or tree martin within each categorical column for each species. The 0s indicate that the box for each category is other species, empty, or occupied.]
+## a.
 
-## b. 
+[The ones in this data set represent an presence of bird within each column, meaning presence of swift parrot, common starling, unoccupied, or tree martin within each categorical column for each species. The 0s indicate that the box for each category is other species, empty, or occupied.]
+
+## b.
+
 [Swift parrots are nomadic, critically endangered due to deforestation and predation, and rarely breed in the same location. The selective nature of swift parrots is different from common starlings and Tree Martins, which are generalists and can easily compete with swift parrots for nest boxes.]
 
-## c. 
+## c.
+
 [The two years the authors looked at were 2016 and 2019 during breeding times for swift parrots stimulated by mast tree flowering event. Swift parrots are not known to occupy repeat breeding sites, so the second season tests how permanent next boxes are utilized by swift parrots and non-target species.]
 
+## d.
 
-## d. 
+| Model number | Season | Distance to Forest Edge | Model Description            |
+|:-------------:|:-------------:|:------------------:|------------------------|
+|      0       |        |                         | No predictors (null model)   |
+|      1       |   X    |            X            | all predictors (full model)  |
+|      2       |   X    |                         | Season Only                  |
+|      3       |        |            X            | Distance to Forest Edge Only |
 
-| Model number | Season | Distance to Forest Edge | Model Description            |  
-|:------------:|:------:|:-----------------------:|------------------------------|  
-| 0            |        |                         | No predictors (null model)   |
-| 1            |    X   |            X            | all predictors (full model)  | 
-| 2            |    X   |                         | Season Only                  |
-| 3            |        |            X            | Distance to Forest Edge Only |    
- 
-## e. 
+## e.
 
 ```{r Cleaning Parrot Data}
 parrot_clean <- parrot |> 
@@ -168,7 +173,10 @@ parrot_clean <- parrot |>
     edge_distance,
     season,
     swift_parrot
-         ) 
+         ) |> 
+  mutate(
+    swift_parrot = as.factor(swift_parrot)
+  )
 ```
 
 ```{r}
@@ -179,11 +187,11 @@ model0 <- glm(
   family = "binomial" # binomial distribution, swift parrot or not
 )
 
-# model 1: Saturated Model
+#model !: Saturated Model
 model1 <- glm(
-  swift_parrot ~ season + edge_distance, # account for season and distance from forest edge
-  data = parrot_clean, # DF
-  family = "binomial" # binomial distribution
+  swift_parrot ~ season + edge_distance, # account for season and distance from forest
+  data = parrot_clean,
+  family = "binomial"
 )
 
 # model 2: Univariate Model: distance from edge
@@ -207,22 +215,66 @@ residuals0 = simulateResiduals(model0)
 residuals1 = simulateResiduals(model1)
 residuals2 = simulateResiduals(model2)
 residuals3 = simulateResiduals(model3)
-
+```
+```{r plot Model Diagnostics}
 # Use DHARMa Package to plot residuals 
+par(mfrow = c(2,2))
 plot(residuals0)
+```
+
+```{r}
+par(mfrow = c(2,2))
 plot(residuals1)
+```
+
+```{r}
+par(mfrow = c(2,2))
 plot(residuals2)
+```
+
+```{r}
+par(mfrow = c(2,2))
 plot(residuals3)
 ```
 
+```{r Select the Best Model: AIC }
+AICc(model0,
+     model1, # Lowest AIC @ 226.3133
+     model2,
+     model3) |> 
+  # arranging output in descending order of AIC
+  arrange(AICc)
+```
 
+# G. Select the Best Model
+[Determined through Aikaike Information Criterion, the saturated model that considered both season and distance from forest edge was the best fit. The best model predicts swift parrots (species) habitation of nest boxes during breeding season includes season (year) and distance from forest edge (m)]
 
+# H. Visualize Model Predictions
+```{r Model 1 Predictions}
+mod_preds <- ggpredict(
+  model1, # model Object
+  terms = c("edge_distance", "season") # predictors
+  ) 
 
-
-
-
-
-
-
-
+ggplot(parrot_clean,
+       aes(x = edge_distance,
+           y = as.numeric(as.character(swift_parrot)))) +
+  geom_point(size = 3,
+             alpha = 0.4) + 
+  geom_ribbon(data = mod_preds,
+              aes(x = x,
+                  y = predicted,
+                  ymin = conf.low,
+                  ymax = conf.high,
+                  fill = group),
+              alpha = 0.4) + 
+  geom_line(data = mod_preds,
+            aes(x = x,
+                y = predicted,
+                color = group),
+            size = 1.2,
+            inherit.aes = FALSE) +
+  scale_y_continuous(limits = c(0,1)) +
+  labs(color = "season", fill = "season")
+```
 
