@@ -333,4 +333,11 @@ For example, In 2019, With every 1m increase in distance, the odds of Swift Parr
 
 Likely swift parrot's specialist preference for tree cavities and dislike for resuing previous breeding locations is behind the declining occupancy prediction with distance from forest and subsequent season since 2016.]
 
+## Problem 4. Affective and exploratory visualizations
 
+a. Comparing Visualization
+[In homework two I visualized a histogram by floor and how often I visited each floor, while in homework three i expanded the histogram to visualize the duration of study sessions throughout the week. They tell a different story, with one representing patterns spatial study habits and the other temporal study habits. In week 9 workshop I saw other visalizations and observed how making sure the visualizations were as simple as possible without excluding important data was key in being affective, I took this advice to create a column for categorizing the type of study session to make the visualization easier to understand. ]
+
+b. Sharing your affective visualization
+
+[I attended every workshop except week ten's because I got sick :( ] 
