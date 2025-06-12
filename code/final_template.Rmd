@@ -24,8 +24,8 @@ library(ggeffects) # generating model predictions
 library(gtsummary) # generating summary tables for models 
 library(ggplot2) # visualizations
 library(hms) # working with times
-library(MuMIn) 
-library(DHARMa)
+library(MuMIn) # For building Model
+library(DHARMa) # For viewing residuals
 ```
 
 ```{r Reading In Data}
@@ -37,15 +37,15 @@ parrot <- read_csv(
 
 # Problem 1. Research Writing
 
-## a.
+## a. Transparent statistical methods 
 
 [In part one they used a correlation test to determine how two variables, distance from headwater (km) and annual total nitrogen load (kg year\^-1) relate or are associated with eachother. My coworker also use an ANOVA in part 2 to compare the means of more than two groups.]
 
-## b.
+## b. More information needed
 
 [Accepting uncertainty is key in interpreting analysis of variance, and can be conducted through communicating the confidence intervals, such as the CI of the difference between urban land, atmospheric deposition, fertilizer, waste water treatment, and grasslands.Tukey's Honestly Signifiant difference can be used to further investigate which groups are different when compares, giving information on pairwise comparison, difference in means between groups, and adjusted p-value to increase transparency.Effect size can also be used to determine how strongly distance from headwaters (KM) effects the annual total nitrogen load (kg year\^-1) found between groups.]
 
-## c.
+## c. Suggestions for rewriting
 
 [We found a negligible difference (n\^2= effect size) between groups in mean nitrogen load (One-Way Anova, F-distribution(among groups Degrees of Freedom,within group Degrees of Freedom) = f-value, p \< 0.02, $\alpha$ = significance level)
 
@@ -161,19 +161,24 @@ ggplot(data = sst_clean, # select cleaned data frame
 
 ```{r Cleaning Parrot Data}
 parrot_clean <- parrot |> 
+  # select orginal data frame
   clean_names() |> 
-   mutate(
+  # remove spaces and upercases
+   mutate( # create new column for swift parrot
     swift_parrot = box_occupant == "swift parrot"
   ) |> 
-  mutate(
+  # create new column for season/year and make it a factor
+  mutate( 
     season = as.factor(season)
   ) |> 
+  # select which columns i want
   select(
     box_occupant,
     edge_distance,
     season,
     swift_parrot
          ) |> 
+  # swift parrot as a factor for modeling
   mutate(
     swift_parrot = as.factor(swift_parrot)
   )
@@ -256,43 +261,46 @@ mod_preds <- ggpredict(
   terms = c("edge_distance", "season") # predictors
   ) 
 
+# Picking colors for each layer of visualization
 mycolors <- c("2016" = "orchid",
               "2019" = "purple3")
 
-ggplot(parrot_clean, # background f
+ggplot(parrot_clean, # background data, include scatterplots
        aes(x = edge_distance,
-           y = as.numeric(swift_parrot) -1
+           y = as.numeric(swift_parrot) -1 # include data despite factor stucture
            )
        ) +
-  geom_point(aes(color = season),
+  geom_point(aes(color = season), # color based on year/season
              size = 3,
              alpha = 0.4) +
   labs(x = substitute(paste(bold('Distance from Forest Edge (m)'))), # label x, y, and legend as well as bold
        y = substitute(paste(bold("Presence of Swift Parrot Predictions"))),
        color = substitute(paste(bold("Year"))),
        ) +
+  # add 95% confidence interval 
   geom_ribbon(data = mod_preds,
               aes(x = x,
                   y = predicted,
-                  ymin = conf.low,
+                  ymin = conf.low, 
                   ymax = conf.high,
                   fill = group),
               alpha = 0.4,
               inherit.aes = FALSE) +
-
+# add line layer to data with model predictions and group by year/season
   geom_line(data = mod_preds,
             aes(x = x,
                 y = predicted,
                 color = group),
             size = 1.2,
             inherit.aes = FALSE) +
-  
+  #manually set colors to previously defined colors
   scale_color_manual(values = mycolors) +
   scale_fill_manual(values = mycolors) +
-  
+  # set scale
   scale_y_continuous(limits = c(0,1)) +
   labs(color = "season",
        fill = "season") + 
+  # remoce grids 
   theme( 
   panel.grid.major = element_blank(), # make everything blan
   panel.grid.minor = element_blank())
@@ -310,6 +318,7 @@ If the forest edge is 0m away the probability of Swift Parrot Occupancy in 2019 
 If the forest edge is 900m away the probability of Swift Parrot Occupancy in 2019 is .06(95%CI[0.03, 0.13])]
 
 ```{r Calculate Model1 Pred: Distance/Season}
+# model formula, select for distance from forest and season/year
 ggpredict(model1,
           terms = c("edge_distance [0]", "season[2016]"))
 
